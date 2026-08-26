@@ -1,0 +1,150 @@
+from fastapi import FastAPI, HTTPException, Header
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+from datetime import date
+import random
+
+app = FastAPI(title="TikTok Viral Boost - Master Edition by Hridoy Hasan", version="16.0")
+
+MY_SECRET_ADMIN_TOKEN = "Admin_Hridoy_2026_Secure_Key"
+ADMIN_WHATSAPP_NUMBER = "01960931813"
+
+app_info = {
+    "app_name": "TikTok Viral Boost Pro",
+    "developer_name": "Hridoy Hasan",
+    "developer_title": "Lead Developer & Founder",
+    "version": "16.0"
+}
+
+admin_announcement = {
+    "banner_image_url": "https://example.com/premium_banner.jpg",
+    "announcement_text": f"💎 মেগা অফার! আমাদের প্রিমিয়াম অ্যাপ নিয়ে টিকটক ভিডিও বানিয়ে ১০০০ ভিউ করান। প্রুফ পাঠাতে সরাসরি WhatsApp এ যোগাযোগ করুন: {ADMIN_WHATSAPP_NUMBER} এবং পান ইনস্ট্যান্ট ৫০০ পয়েন্ট বোনাস! 🚀",
+    "is_active": True
+}
+
+users_db = {
+    "user_123": {
+        "username": "creator_hridoy", 
+        "points": 500, 
+        "streak_days": 1, 
+        "last_login_date": None, 
+        "device_id": "dev_001",
+        "is_vip": True,
+        "is_banned": False
+    }
+}
+
+campaigns_db = [
+    {"campaign_id": "c1", "user_id": "user_123", "tiktok_username": "creator_hridoy", "video_id": "vid_999", "likes_needed": 10, "likes_got": 2, "is_vip_boost": True, "status": "active"}
+]
+
+class RegisterModel(BaseModel):
+    user_id: str
+    username: str
+    device_id: str
+    referral_code: str = None
+
+class LoginModel(BaseModel):
+    username: str
+    device_id: str
+
+class CampaignCreate(BaseModel):
+    user_id: str
+    tiktok_username: str
+    video_id: str
+    likes_needed: int
+    is_vip_boost: bool = False
+
+# 📱 ওয়েবসাইট UI (ব্রাউজারে সরাসরি দেখার জন্য)
+@app.get("/", response_class=HTMLResponse)
+def home_page():
+    return f"""
+    <!DOCTYPE html>
+    <html lang="bn">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{app_info['app_name']} - By {app_info['developer_name']}</title>
+        <style>
+            body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }}
+            .card {{ background: #1e293b; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border: 1px solid #334155; }}
+            h1 {{ color: #38bdf8; font-size: 24px; margin-bottom: 5px; }}
+            .dev-tag {{ color: #94a3b8; font-size: 14px; margin-bottom: 20px; }}
+            .banner {{ background: #0284c7; padding: 15px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }}
+            input {{ width: 100%; padding: 12px; margin: 10px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 8px; box-sizing: border-box; }}
+            button {{ width: 100%; padding: 12px; background: #22c55e; border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 10px; font-size: 16px; }}
+            button:hover {{ background: #16a34a; }}
+            .footer {{ margin-top: 20px; font-size: 12px; color: #64748b; }}
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>🔥 {app_info['app_name']}</h1>
+            <div class="dev-tag">Developed by <b>{app_info['developer_name']}</b></div>
+            
+            <div class="banner">
+                {admin_announcement['announcement_text']}
+            </div>
+
+            <div>
+                <h3>লগইন করুন</h3>
+                <input type="text" id="username" placeholder="আপনার ইউজারনেম দিন (যেমন: creator_hridoy)">
+                <input type="text" id="device_id" placeholder="ডিভাইস আইডি" value="dev_001">
+                <button onclick="loginUser()">প্রবেশ করুন (Login)</button>
+            </div>
+            
+            <div id="result" style="margin-top: 15px; font-size: 14px; color: #38bdf8;"></div>
+
+            <div class="footer">
+                Powered by Hridoy Hasan Tech &copy; 2026
+            </div>
+        </div>
+
+        <script>
+            async function loginUser() {{
+                const username = document.getElementById('username').value;
+                const device_id = document.getElementById('device_id').value;
+                const resultDiv = document.getElementById('result');
+
+                if(!username) {{
+                    alert('দয়া করে ইউজারনেম লিখুন!');
+                    return;
+                }}
+
+                try {{
+                    const response = await fetch('/api/v1/login-user/', {{
+                        method: 'POST',
+                        headers: {{ 'Content-Type': 'application/json' }},
+                        body: JSON.stringify({{ username: username, device_id: device_id }})
+                    }});
+                    const data = await response.json();
+                    if(response.ok) {{
+                        resultDiv.innerHTML = "✅ লগইন সফল! আপনার পয়েন্ট: " + data.points + " (VIP: " + data.is_vip + ")";
+                        resultDiv.style.color = "#4ade80";
+                    }} else {{
+                        resultDiv.innerHTML = "❌ " + (data.detail || "ত্রুটি হয়েছে!");
+                        resultDiv.style.color = "#f87171";
+                    }}
+                }} catch(err) {{
+                    resultDiv.innerHTML = "❌ সার্ভার কানেকশন এরর!";
+                }}
+            }}
+        </script>
+    </body>
+    </html>
+    """
+
+# API Endpoints
+@app.get("/api/v1/developer-info/")
+def get_developer_info():
+    return {"status": "success", "developer": app_info["developer_name"], "title": app_info["developer_title"]}
+
+@app.post("/api/v1/login-user/")
+def login_user(data: LoginModel):
+    for u_id, u_data in users_db.items():
+        if u_data["username"].lower() == data.username.lower():
+            if u_data["is_banned"]:
+                raise HTTPException(status_code=403, detail="অ্যাকাউন্ট ব্যান করা হয়েছে!")
+            return {"status": "success", "user_id": u_id, "username": u_data["username"], "points": u_data["points"], "is_vip": u_data["is_vip"]}
+    
+    raise HTTPException(status_code=404, detail="অ্যাকাউন্ট পাওয়া যায়নি! প্রথমে রেজিস্টার করুন।")
