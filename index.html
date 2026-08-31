@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Store Pro - Ultimate Topup & Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #ec4899;
+            --bg-dark: #090d16;
+            --bg-card: #111827;
+            --border: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .trust-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .hero {
+            padding: 150px 20px 60px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .hero span {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin: 40px 0 20px;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .package-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .package-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .package-card:hover, .package-card.selected {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            background: #162032;
+        }
+
+        .package-card:hover::before, .package-card.selected::before {
+            opacity: 1;
+        }
+
+        .package-card i {
+            font-size: 32px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #f43f5e, #fb7185);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .package-card.service-icon i {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .package-card h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .package-card .price {
+            font-size: 16px;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .order-wrapper {
+            max-width: 700px;
+            margin: 50px auto 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: #090d16;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .notice-box {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px dashed var(--primary);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #cbd5e1;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .payment-number {
+            font-size: 18px;
+            color: #34d399;
+            font-weight: bold;
+            background: rgba(16, 185, 129, 0.12);
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 5px;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-submit:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        footer {
+            background: var(--bg-card);
+            text-align: center;
+            padding: 25px;
+            margin-top: 80px;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .order-wrapper { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- হেডার -->
+    <header>
+        <div class="nav-container">
+            <div class="logo"><i class="fa-solid fa-gem"></i> Nexus Store Pro</div>
+            <div class="trust-badge">
+                <i class="fa-solid fa-shield-check"></i> ১০০% ট্রাস্টেড ও ভেরিফাইড
+            </div>
+        </div>
+    </header>
+
+    <!-- হিরো সেকশন -->
+    <section class="hero">
+        <h1>গেম ডায়মন্ড ও <span>প্রিমিয়াম সাবস্ক্রিপশন</span> জোন</h1>
+        <p>ফ্রি ফায়ার ইউআইডি টপআপ, ক্যাপকাট প্রো এবং মেগা ডায়মন্ড প্যাক এক ক্লিকেই!</p>
+    </section>
+
+    <div class="container">
+        <!-- মেম্বারশিপ প্যাকেজ -->
+        <h2 class="section-title"><i class="fa-solid fa-crown"></i> মেম্বারশিপ প্যাকেজ</h2>
+        <div class="package-grid">
+            <div class="package-card" onclick="selectPackage('উইকলি মেম্বারশিপ', '৳ ১৮০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>উইকলি মেম্বারশিপ</h3>
+                <div class="price">৳ ১৮০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('১০x উইকলি মেম্বারশিপ', '৳ ১,৮০০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>১০x উইকলি মেম্বারশিপ</h3>
+                <div class="price">৳ ১,৮০০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('মান্থলি মেম্বারশিপ', '৳ ৯০০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>মান্থলি মেম্বারশিপ</h3>
+                <div class="price">৳ ৯০০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('১০x মান্থলি মেম্বারশিপ', '৳ ৯,০০০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>১০x মান্থলি মেম্বারশিপ</h3>
+                <div class="price">৳ ৯,০০০</div>
+            </div>
+        </div>
+
+        <!-- প্রিমিয়াম সার্ভিস ও অ্যাপস -->
+        <h2 class="section-title"><i class="fa-solid fa-star"></i> প্রিমিয়াম অ্যাপস ও সার্ভিস</h2>
+        <div class="package-grid">
+            <div class="package-card service-icon" onclick="selectPackage('CapCut Pro (1 Month)', '৳ ১৫০')">
+                <i class="fa-solid fa-video"></i>
+                <h3>CapCut Pro</h3>
+                <div class="price">৳ ১৫০ / মাস</div>
+            </div>
+            <div class="package-card service-icon" onclick="selectPackage('Netflix Premium (1 Month)', '৳ ২৫০')">
+                <i class="fa-solid fa-tv"></i>
+                <h3>Netflix Premium</h3>
+                <div class="price">৳ ২৫০ / মাস</div>
+            </div>
+            <div class="package-card service-icon" onclick="selectPackage('Spotify Premium (1 Month)', '৳ ১২০')">
+                <i class="fa-solid fa-music"></i>
+                <h3>Spotify Premium</h3>
+                <div class="price">৳ ১২০ / মাস</div>
+            </div>
+            <div class="package-card service-icon" onclick="selectPackage('YouTube Premium (1 Month)', '৳ ১০০')">
+                <i class="fa-brands fa-youtube"></i>
+                <h3>YouTube Premium</h3>
+                <div class="price">৳ ১০০ / মাস</div>
+            </div>
+        </div>
+
+        <!-- মেগা ডায়মন্ড টপআপ লিস্ট -->
+        <h2 class="section-title"><i class="fa-solid fa-fire"></i> মেগা ডায়মন্ড টপআপ লিস্ট</h2>
+        <div class="package-grid">
+            <div class="package-card" onclick="selectPackage('25 Diamonds', '৳ ২০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>25 Diamonds</h3>
+                <div class="price">৳ ২০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('50 Diamonds', '৳ ৩৫')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>50 Diamonds</h3>
+                <div class="price">৳ ৩৫</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('100 Diamonds', '৳ ৭০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>100 Diamonds</h3>
+                <div class="price">৳ ৭০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('115 Diamonds', '৳ ৯০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>115 Diamonds</h3>
+                <div class="price">৳ ৯০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('240 Diamonds', '৳ ১৫৮')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>240 Diamonds</h3>
+                <div class="price">৳ ১৫৮</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('355 Diamonds', '৳ ২৩৭')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>355 Diamonds</h3>
+                <div class="price">৳ ২৩৭</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('480 Diamonds', '৳ ৩১৬')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>480 Diamonds</h3>
+                <div class="price">৳ ৩১৬</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('610 Diamonds', '৳ ৪০০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>610 Diamonds</h3>
+                <div class="price">৳ ৪০০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('725 Diamonds', '৳ ৪৭৯')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>725 Diamonds</h3>
+                <div class="price">৳ ৪৭৯</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('850 Diamonds', '৳ ৫৫৮')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>850 Diamonds</h3>
+                <div class="price">৳ ৫৫৮</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('965 Diamonds', '৳ ৬৩৭')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>965 Diamonds</h3>
+                <div class="price">৳ ৬৩৭</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('1090 Diamonds', '৳ ৭১৬')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>1090 Diamonds</h3>
+                <div class="price">৳ ৭১৬</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('1240 Diamonds', '৳ ৮১৫')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>1240 Diamonds</h3>
+                <div class="price">৳ ৮১৫</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('1550 Diamonds', '৳ ১,০১০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>1550 Diamonds</h3>
+                <div class="price">৳ ১,০১০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('1850 Diamonds', '৳ ১,২১০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>1850 Diamonds</h3>
+                <div class="price">৳ ১,২১০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('2160 Diamonds', '৳ ১,৪১০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>2160 Diamonds</h3>
+                <div class="price">৳ ১,৪১০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('2530 Diamonds', '৳ ১,৬৫০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>2530 Diamonds</h3>
+                <div class="price">৳ ১,৬৫০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('3100 Diamonds', '৳ ২,০০০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>3100 Diamonds</h3>
+                <div class="price">৳ ২,০০০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('5000 Diamonds', '৳ ৩,২০০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>5000 Diamonds</h3>
+                <div class="price">৳ ৩,২০০</div>
+            </div>
+            <div class="package-card" onclick="selectPackage('8000 Diamonds', '৳ ৫,১০০')">
+                <i class="fa-solid fa-gem"></i>
+                <h3>8000 Diamonds</h3>
+                <div class="price">৳ ৫,১০০</div>
+            </div>
+        </div>
+
+        <!-- অর্ডার ফর্ম সেকশন -->
+        <div class="order-wrapper">
+            <h2 class="section-title" style="margin-top: 0; border: none; justify-content: center;"><i class="fa-solid fa-cart-shopping"></i> অর্ডার সম্পন্ন করুন</h2>
+            <div class="notice-box">
+                <i class="fa-solid fa-circle-info"></i> ওপর থেকে আপনার পছন্দের প্যাকেজে ক্লিক করে সিলেক্ট করুন।<br>
+                পেমেন্ট করার জন্য নিচের বিকাশ পার্সোনাল নাম্বারে <b>Send Money</b> করুন:<br>
+                <div class="payment-number"><i class="fa-solid fa-wallet"></i> 01972839306 (Personal)</div>
+            </div>
+            <form onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="gameId">গেম ইউজার আইডি (UID) / অ্যাকাউন্ট ইনফো</label>
+                    <input type="text" id="gameId" placeholder="আপনার গেম ইউআইডি বা জিমেইল লিখুন" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="selectedPkg">সিলেক্টেড প্যাকেজ</label>
+                    <input type="text" id="selectedPkg" value="প্যাকেজ সিলেক্ট করা হয়নি" readonly style="color: #38bdf8; font-weight: bold;">
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentMethod">পেমেন্ট মাধ্যম</label>
+                    <select id="paymentMethod" required>
+                        <option value="">পেমেন্ট মাধ্যম সিলেক্ট করুন</option>
+                        <option value="bKash">বিকাশ (bKash) - Send Money</option>
+                        <option value="Nagad">নগদ (Nagad) - Send Money</option>
+                        <option value="Rocket">রকেট (Rocket) - Send Money</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="trxId">ট্রানজেকশন আইডি (TrxID)</label>
+                    <input type="text" id="trxId" placeholder="টাকা পাঠিয়ে ট্রানজেকশন আইডি দিন" required>
+                </div>
+
+                <button type="submit" class="btn-submit">অর্ডার কনফার্ম করুন</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ফুটার -->
+    <footer>
+        <p>&copy; ২০২৬ Nexus Store Pro. সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <script>
+        function selectPackage(packageName, packagePrice) {
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            document.getElementById('selectedPkg').value = packageName + ' (' + packagePrice + ')';
+            
+            // অর্ডার ফর্মের দিকে অটো স্ক্রল করবে
+            document.querySelector('.order-wrapper').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            const pkg = document.getElementById('selectedPkg').value;
+            const uid = document.getElementById('gameId').value;
+            const trx = document.getElementById('trxId').value;
+
+            if(pkg.includes('প্যাকেজ সিলেক্ট করা হয়নি')) {
+                alert('দয়া করে প্রথমে ওপরের লিস্ট থেকে যেকোনো একটি প্যাকেজ বা সার্ভিস সিলেক্ট করুন!');
+                return;
+            }
+
+            if(uid === '' || trx === '') {
+                alert('দয়া করে আপনার গেম ইউআইডি (UID) এবং ট্রানজেকশন আইডি (TrxID) সঠিকভাবে দিন!');
+                return;
+            }
+
+            alert('অভিনন্দন! আপনার অর্ডারটি সফলভাবে সাবমিট হয়েছে। TrxID: ' + trx + ' ভেরিফাই করে খুব শীঘ্রই আপনার অর্ডারটি ডেলিভারি করা হবে।');
+            event.target.reset();
+            document.getElementById('selectedPkg').value = "প্যাকেজ সিলেক্ট করা হয়নি";
+            document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
+        }
+    </script>
+</body>
+</html>
