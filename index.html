@@ -3,29 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Call</title>
+    <title>P2P Voice Call</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #222; color: #fff; padding: 15px; }
-        input { font-size: 18px; padding: 8px; width: 85%; text-align: center; margin-bottom: 10px; }
-        .box { background: #333; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
-        .hint { color: #ffca28; font-size: 14px; }
+        body { background: #121212; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        .card { background: #1e1e1e; padding: 15px; margin: 10px auto; border-radius: 8px; max-width: 300px; }
+        input { padding: 10px; width: 80%; margin-top: 10px; border-radius: 5px; border: none; font-size: 16px; }
+        button { background: #00ff88; color: #000; border: none; padding: 12px 20px; margin-top: 15px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 85%; }
+        button:active { background: #00cc6a; }
     </style>
 </head>
 <body>
-    <h3>P2P Voice Call</h3>
-    <div class="box">
-        <p>আমার ID: <strong id="my-id" style="color:#00ff88;">...</strong></p>
-        <p>স্ট্যাটাস: <span id="status" style="color:#ff4444;">Offline</span></p>
+    <h2>P2P Voice Call</h2>
+    
+    <div class="card">
+        <h3>আমার ID: <span id="my-id">...</span></h3>
+        <p>স্ট্যাটাস: <span id="status" style="color: red;">Offline</span></p>
     </div>
-    <div id="incoming-box" class="box" style="display:none; border: 2px solid #00ff88;">
-        <p>🚨 <strong id="caller-id"></strong> কল দিচ্ছেন!</p>
-        <p class="hint">ধরতে <b>OK</b> | কাটতে <b>Back/End</b></p>
+
+    <div class="card">
+        <input type="text" id="peer-id" placeholder="যাকে কল করবেন তার ID">
+        <br>
+        <button id="call-btn" onclick="makeCall()">📞 কল করুন</button>
     </div>
-    <div class="box">
-        <input type="tel" id="peer-id" placeholder="যাকে কল করবেন তার ID">
-        <p class="hint">ডায়াল করতে <b>OK</b> চাপুন</p>
+
+    <div id="incoming-box" class="card" style="display:none;">
+        <p>ইনকামিং কল এসেছে! আইডি: <span id="caller-id"></span></p>
     </div>
+
     <audio id="remote-audio" autoplay></audio>
-    <script src="app.js"></script>
+
+    <script>
+        const ws = new WebSocket(`wss://${window.location.host}`);
+        let myId = Math.floor(1000 + Math.random() * 9000).toString();
+        let peerConnection;
+        let localStream;
+
+        const config = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        };
+
+        ws.onopen = () => {
+            document.getElementById('my-id').innerText = myId;
+            document.getElementById('status').innerText = 'Online';
+            document.getElementById('status').style.color = '#00ff88';
+            ws.send(JSON.stringify({ type: 'register', uid: myId }));
+        };
+
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+            .then(stream => {
+                localStream = stream;
+            })
+            .catch(err => {
+                console.error('Mic permission denied:', err);
+            });
+
+        ws.onmessage = async (event) => {
+            const message = JSON.parse(event.data);
+
+            if (message.type === 'offer') {
+                document.getElementById('caller-id').innerText = message.senderUid;
+                document.getElementById('incoming-box').style.display = 'block';
+
+                peerConnection = createPeerConnection(message.senderUid);
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(message.offer));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+
+                ws.send(JSON.stringify({
+                    type: 'answer',
+                    answer: answer,
+                    targetUid: message.senderUid,
+                    senderUid: myId
+                }));
+            } else if (message.type === 'answer') {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(message.answer));
+            } else if (message.type === 'candidate') {
+                if (peerConnection) {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(message.candidate));
+                }
+            }
+        };
+
+        function createPeerConnection(targetUid) {
+            const pc = new RTCPeerConnection(config);
+            
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+            pc.ontrack = (event) => {
+                document.getElementById('remote-audio').srcObject = event.streams[0];
+            };
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    ws.send(JSON.stringify({
+                        type: 'candidate',
+                        candidate: event.candidate,
+                        targetUid: targetUid,
+                        senderUid: myId
+                    }));
+                }
+            };
+
+            return pc;
+        }
+
+        async function makeCall() {
+            const targetUid = document.getElementById('peer-id').value;
+            if (!targetUid) {
+                alert('দয়া করে আইডি লিখুন');
+                return;
+            }
+
+            peerConnection = createPeerConnection(targetUid);
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            ws.send(JSON.stringify({
+                type: 'offer',
+                offer: offer,
+                targetUid: targetUid,
+                senderUid: myId
+            }));
+            alert('কল পাঠানো হয়েছে...');
+        }
+    </script>
 </body>
 </html>
