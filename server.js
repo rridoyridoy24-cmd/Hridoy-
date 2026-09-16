@@ -1,33 +1,40 @@
+const express = require('express');
+const http = require('http');
 const WebSocket = require('ws');
-const PORT = process.env.PORT || 3000;
-const wss = new WebSocket.Server({ port: PORT });
+const path = require('path');
 
-const clients = {};
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+const clients = new Map();
+
+// index.html সহ সব স্ট্যাটিক ফাইল সার্ভ করার জন্য
+app.use(express.static(path.join(__dirname, './')));
 
 wss.on('connection', (ws) => {
-  let userUid = null;
+    ws.on('message', (message) => {
+        try {
+            const data = JSON.parse(message);
+            
+            if (data.type === 'register') {
+                clients.set(data.uid, ws);
+                ws.uid = data.uid;
+            } else if (data.type === 'offer' || data.type === 'answer' || data.type === 'candidate') {
+                const targetWs = clients.get(data.targetUid);
+                if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+                    targetWs.send(JSON.stringify(data));
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
 
-  ws.on('message', (message) => {
-    try {
-      const data = JSON.parse(message);
-
-      if (data.type === 'register') {
-        userUid = data.uid;
-        clients[userUid] = ws;
-        console.log(`User registered: ${userUid}`);
-      } else if (data.target && clients[data.target]) {
-        clients[data.target].send(JSON.stringify(data));
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  });
-
-  ws.on('close', () => {
-    if (userUid && clients[userUid]) {
-      delete clients[userUid];
-    }
-  });
+    ws.on('close', () => {
+        if (ws.uid) clients.delete(ws.uid);
+    });
 });
 
-console.log(`Server running on port ${PORT}`);
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
