@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "name": "P2P Voice Call",
+  "description": "Voice Call App for KaiOS",
+  "launch_path": "/index.html",
+  "developer": { "name": "Hridoy" },
+  "permissions": {
+    "audio-capture": { "description": "Microphone Access" }
+  },
+  "default_locale": "en-US"
+}
