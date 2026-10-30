@@ -10,11 +10,13 @@ app.get('/', (req, res) => {
 
 app.post('/verify', (req, res) => {
     const { key } = req.body;
-    if (key === "HRIDOY-FULL-2026") {
-        res.json({ valid: true, message: "Key is valid" });
-    } else {
-        res.json({ valid: false, message: "Invalid Key" });
-    }
+    // যেকোনো কি দিলেই সাথে সাথে ভ্যালিড বলে পাস করে দেবে
+    res.json({ 
+        valid: true, 
+        message: "Premium Key activated!",
+        plan_name: "VIP Premium",
+        expires_at: 0 // 0 মানে লাইফটাইম
+    });
 });
 
 app.listen(PORT, () => {
