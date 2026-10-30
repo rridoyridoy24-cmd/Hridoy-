@@ -19,6 +19,6 @@ app.post('/verify', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, () => {// update
     console.log(`Server is running on port ${PORT}`);
 });
