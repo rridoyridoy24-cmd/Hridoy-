@@ -1,3 +1,4 @@
+
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,17 +9,19 @@ app.get('/', (req, res) => {
     res.send('License Server is Live!');
 });
 
-app.post('/verify', (req, res) => {
-    const { key } = req.body;
-    // যেকোনো কি দিলেই সাথে সাথে ভ্যালিড বলে পাস করে দেবে
-    res.json({ 
-        valid: true, 
+// সব ধরনের রিকোয়েস্ট (GET এবং POST উভয়ই) হ্যান্ডেল করার জন্য
+app.all('/verify', (req, res) => {
+    res.json({
+        valid: true,
         message: "Premium Key activated!",
         plan_name: "VIP Premium",
-        expires_at: 0 // 0 মানে লাইফটাইম
+        expires_at: 0,
+        device_limit: 1,
+        devices_used: 1,
+        server_time: Date.now()
     });
 });
 
-app.listen(PORT, () => {// update
+app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
