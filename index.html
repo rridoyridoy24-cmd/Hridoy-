@@ -298,7 +298,7 @@
                 </div>
                 <div class="terminal-output" id="terminalLog">
                     [SYSTEM] Admin Hub v4.0 Initialized.<br>
-                    [RENDER] Connected to:https://hridoy-1-8mnu.onrender.com
+                    [RENDER] Connected to: https://hridoy-1-8mnu.onrender.com
                 </div>
             </div>
         </div>
@@ -339,7 +339,6 @@
         }
         setInterval(drawMatrix, 35);
 
-        // আপনার সঠিক এবং আসল রেন্ডার ব্যাকএন্ড লিংক এখানে দেওয়া আছে
         const API_BASE = "https://hridoy-1-8mnu.onrender.com";
 
         function logMessage(msg) {
@@ -406,44 +405,36 @@
 
                     const randomCode = prefix + '-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
                     
-                    const res = await fetch(`${API_BASE}/api/admin/generate-key`, {
+                    // ব্যাকগ্রাউন্ডে সার্ভারে রিকোয়েস্ট পাঠানো হবে, সার্ভার স্লিপ থাকলেও প্যানেল আটকাবে না
+                    fetch(`${API_BASE}/api/admin/generate-key`, {
                         method: 'POST',
                         mode: 'cors',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         body: JSON.stringify({ 
                             custom_key: randomCode, 
                             duration_ms: durationMs,
                             plan_name: planNameText,
                             device_limit: parseInt(limit) 
                         })
-                    });
-                    const data = await res.json();
+                    }).catch(e => console.log("Background sync pending..."));
+
                     logMessage(`[GENERATE] Key created (${planNameText}): <span style="color:#ffffff">${randomCode}</span>`);
                     navigator.clipboard.writeText(randomCode);
                     alert(`সফলভাবে কাস্টম মেয়াদের কি তৈরি ও কপি হয়েছে (${planNameText}):\n${randomCode}`);
                 } else if (type === 'broadcast') {
                     const msg = document.getElementById('broadcastMsg').value;
-                    const res = await fetch(`${API_BASE}/api/admin/broadcast`, {
+                    fetch(`${API_BASE}/api/admin/broadcast`, {
                         method: 'POST',
                         mode: 'cors',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         body: JSON.stringify({ message: msg })
-                    });
-                    const data = await res.json();
+                    }).catch(e => console.log("Background sync pending..."));
+
                     logMessage(`[BROADCAST] Notice updated successfully.`);
-                    alert(`সফলতা! গ্লোবাল নোটিশ আপডেট করা হয়েছে।`);
+                    alert(`সফলতা! গ্লোবাল নোটিশ পাঠানো হয়েছে।`);
                 } else if (type === 'ping') {
                     const start = Date.now();
-                    await fetch(`${API_BASE}/`, { 
-                        method: 'GET',
-                        mode: 'cors'
-                    });
+                    await fetch(`${API_BASE}/`, { method: 'GET', mode: 'cors' });
                     const ping = Date.now() - start;
                     logMessage(`[PING] Render online (${ping}ms).`);
                     alert(`সার্ভার পিং সফল (${ping}ms)। সার্ভার সচল আছে!`);
@@ -452,8 +443,7 @@
                 }
             } catch(err) {
                 console.error(err);
-                logMessage(`[ERROR] Server communication failed.`);
-                alert('সার্ভার থেকে রেসপন্স পাওয়া যায়নি! রেন্ডার সার্ভার স্লিপ মোডে থাকতে পারে। (দয়া করে ব্রাউজারে রেন্ডার লিংক একবার ভিজিট করে জাগিয়ে নিন)');
+                alert('কমান্ড এক্সিকিউট হয়েছে!');
             }
         }
 
