@@ -339,7 +339,7 @@
         }
         setInterval(drawMatrix, 35);
 
-        // আপনার সঠিক এবং আসল রেন্ডার ব্যাকএন্ড লিংক এখানে আপডেট করা হয়েছে
+        // আপনার সঠিক এবং আসল রেন্ডার ব্যাকএন্ড লিংক এখানে দেওয়া আছে
         const API_BASE = "https://hridoy-1-8mnu.onrender.com";
 
         function logMessage(msg) {
@@ -408,7 +408,11 @@
                     
                     const res = await fetch(`${API_BASE}/api/admin/generate-key`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'cors',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
                         body: JSON.stringify({ 
                             custom_key: randomCode, 
                             duration_ms: durationMs,
@@ -424,7 +428,11 @@
                     const msg = document.getElementById('broadcastMsg').value;
                     const res = await fetch(`${API_BASE}/api/admin/broadcast`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'cors',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
                         body: JSON.stringify({ message: msg })
                     });
                     const data = await res.json();
@@ -432,7 +440,10 @@
                     alert(`সফলতা! গ্লোবাল নোটিশ আপডেট করা হয়েছে।`);
                 } else if (type === 'ping') {
                     const start = Date.now();
-                    await fetch(`${API_BASE}/`, { method: 'GET' });
+                    await fetch(`${API_BASE}/`, { 
+                        method: 'GET',
+                        mode: 'cors'
+                    });
                     const ping = Date.now() - start;
                     logMessage(`[PING] Render online (${ping}ms).`);
                     alert(`সার্ভার পিং সফল (${ping}ms)। সার্ভার সচল আছে!`);
@@ -440,6 +451,7 @@
                     alert('কমান্ড সফলভাবে সম্পন্ন হয়েছে!');
                 }
             } catch(err) {
+                console.error(err);
                 logMessage(`[ERROR] Server communication failed.`);
                 alert('সার্ভার থেকে রেসপন্স পাওয়া যায়নি! রেন্ডার সার্ভার স্লিপ মোডে থাকতে পারে। (দয়া করে ব্রাউজারে রেন্ডার লিংক একবার ভিজিট করে জাগিয়ে নিন)');
             }
