@@ -298,7 +298,7 @@
                 </div>
                 <div class="terminal-output" id="terminalLog">
                     [SYSTEM] Admin Hub v4.0 Initialized.<br>
-                    [RENDER] Connected to: https://hridoy-hyn7.onrender.com
+                    [RENDER] Connected to: https://hridoy-1-8mnu.onrender.com
                 </div>
             </div>
         </div>
@@ -339,8 +339,8 @@
         }
         setInterval(drawMatrix, 35);
 
-        // ঠিক করা হলো আপনার আসল এবং সঠিক রেন্ডার ব্যাকএন্ড লিংক
-        const API_BASE = "https://hridoy-hyn7.onrender.com";
+        // আপনার সঠিক এবং আসল রেন্ডার ব্যাকএন্ড লিংক এখানে আপডেট করা হয়েছে
+        const API_BASE = "https://hridoy-1-8mnu.onrender.com";
 
         function logMessage(msg) {
             const term = document.getElementById('terminalLog');
@@ -430,8 +430,6 @@
                     const data = await res.json();
                     logMessage(`[BROADCAST] Notice updated successfully.`);
                     alert(`সফলতা! গ্লোবাল নোটিশ আপডেট করা হয়েছে।`);
-                } else if (type ===8) {
-                    // fallback ping
                 } else if (type === 'ping') {
                     const start = Date.now();
                     await fetch(`${API_BASE}/`, { method: 'GET' });
