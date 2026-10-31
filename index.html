@@ -5,194 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HRIDOY AI ASSISTANT - Cyber Matrix Hub v4.0</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        body {
-            background-color: #010402;
-            color: #00ffcc;
-            overflow-x: hidden;
-            position: relative;
-            min-height: 100vh;
-            padding-bottom: 50px;
-        }
-        #matrixCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.65;
-        }
-        .container {
-            max-width: 480px;
-            margin: 10px auto;
-            padding: 10px;
-            position: relative;
-            z-index: 2;
-        }
-        .header-box {
-            background: rgba(0, 15, 8, 0.25);
-            border: 2px solid #00ffcc;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.8), inset 0 0 20px rgba(0, 255, 204, 0.4);
-            margin-bottom: 12px;
-            backdrop-filter: blur(5px);
-        }
-        .window-dots {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
+        body { background-color: #010402; color: #00ffcc; overflow-x: hidden; min-height: 100vh; padding-bottom: 50px; }
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.65; }
+        .container { max-width: 480px; margin: 10px auto; padding: 10px; position: relative; z-index: 2; }
+        .header-box { background: rgba(0, 15, 8, 0.25); border: 2px solid #00ffcc; border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 0 30px rgba(0, 255, 204, 0.8); margin-bottom: 12px; backdrop-filter: blur(5px); }
+        .window-dots { display: flex; gap: 6px; margin-bottom: 6px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; }
         .dot-red { background: #ff3333; box-shadow: 0 0 10px #ff3333; }
         .dot-yellow { background: #ffcc00; box-shadow: 0 0 10px #ffcc00; }
         .dot-green { background: #00ff66; box-shadow: 0 0 10px #00ff66; }
-
-        h1 {
-            font-size: 1.2rem;
-            color: #ffffff;
-            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
-            letter-spacing: 2px;
-            margin-bottom: 2px;
-        }
-        .subtitle {
-            font-size: 0.65rem;
-            color: #88ffcc;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .nav-tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 12px;
-            background: rgba(0, 10, 5, 0.35);
-            padding: 5px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 255, 204, 0.6);
-            backdrop-filter: blur(5px);
-            position: sticky;
-            top: 5px;
-            z-index: 10;
-        }
-        .tab-btn {
-            flex: 1;
-            background: rgba(0, 20, 10, 0.25);
-            border: 1.5px solid #00ffcc;
-            color: #00ffcc;
-            padding: 8px 4px;
-            font-size: 0.65rem;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-            text-transform: uppercase;
-            transition: 0.2s;
-        }
-        .tab-btn.active, .tab-btn:hover {
-            background: #00ffcc;
-            color: #010402;
-            box-shadow: 0 0 20px #00ffcc;
-        }
+        h1 { font-size: 1.2rem; color: #ffffff; text-shadow: 0 0 10px #00ffcc; letter-spacing: 2px; }
+        .subtitle { font-size: 0.65rem; color: #88ffcc; text-transform: uppercase; }
+        .nav-tabs { display: flex; gap: 5px; margin-bottom: 12px; background: rgba(0, 10, 5, 0.35); padding: 5px; border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.6); position: sticky; top: 5px; z-index: 10; }
+        .tab-btn { flex: 1; background: rgba(0, 20, 10, 0.25); border: 1.5px solid #00ffcc; color: #00ffcc; padding: 8px 4px; font-size: 0.65rem; font-weight: bold; border-radius: 5px; cursor: pointer; text-align: center; text-transform: uppercase; }
+        .tab-btn.active, .tab-btn:hover { background: #00ffcc; color: #010402; box-shadow: 0 0 20px #00ffcc; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card {
-            background: rgba(0, 10, 5, 0.20);
-            border: 1.5px solid #00ffcc;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.45), inset 0 0 12px rgba(0, 255, 204, 0.2);
-            backdrop-filter: blur(3px);
-        }
-        .card-title {
-            font-size: 0.8rem;
-            color: #ffffff;
-            text-shadow: 0 0 8px #00ffcc;
-            margin-bottom: 8px;
-            border-bottom: 1px dashed rgba(0, 255, 204, 0.5);
-            padding-bottom: 4px;
-            text-transform: uppercase;
-        }
+        .tab-content.active { display: block; }
+        .card { background: rgba(0, 10, 5, 0.20); border: 1.5px solid #00ffcc; border-radius: 10px; padding: 12px; margin-bottom: 10px; box-shadow: 0 0 25px rgba(0, 255, 204, 0.45); }
+        .card-title { font-size: 0.8rem; color: #ffffff; text-shadow: 0 0 8px #00ffcc; margin-bottom: 8px; border-bottom: 1px dashed rgba(0, 255, 204, 0.5); padding-bottom: 4px; text-transform: uppercase; }
         .input-group { margin-bottom: 8px; }
-        label {
-            display: block;
-            font-size: 0.62rem;
-            color: #aaffcc;
-            margin-bottom: 3px;
-            text-transform: uppercase;
-        }
-        input, select, textarea {
-            width: 100%;
-            background: rgba(0, 5, 2, 0.35);
-            border: 1.5px solid #00ffcc;
-            color: #00ffcc;
-            padding: 7px;
-            border-radius: 5px;
-            font-size: 0.78rem;
-            outline: none;
-            box-shadow: inset 0 0 8px rgba(0,255,204,0.3);
-        }
-        .btn {
-            width: 100%;
-            background: linear-gradient(45deg, rgba(0,50,20,0.5), rgba(0,100,40,0.5));
-            border: 1.5px solid #00ffcc;
-            color: #ffffff;
-            padding: 9px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 4px;
-            font-size: 0.75rem;
-            text-shadow: 0 0 6px #00ffcc;
-        }
-        .btn:hover { background: #00ffcc; color: #010402; box-shadow: 0 0 30px #00ffcc; text-shadow: none; }
+        label { display: block; font-size: 0.62rem; color: #aaffcc; margin-bottom: 3px; text-transform: uppercase; }
+        input, select, textarea { width: 100%; background: rgba(0, 5, 2, 0.35); border: 1.5px solid #00ffcc; color: #00ffcc; padding: 7px; border-radius: 5px; font-size: 0.78rem; outline: none; }
+        .btn { width: 100%; background: linear-gradient(45deg, rgba(0,50,20,0.5), rgba(0,100,40,0.5)); border: 1.5px solid #00ffcc; color: #ffffff; padding: 9px; font-weight: bold; border-radius: 5px; cursor: pointer; text-transform: uppercase; margin-top: 4px; font-size: 0.75rem; }
+        .btn:hover { background: #00ffcc; color: #010402; box-shadow: 0 0 30px #00ffcc; }
         .btn-cyan { border-color: #00ffff; color: #00ffff; }
         .btn-warning { border-color: #ffcc00; color: #ffcc00; }
         .btn-danger { border-color: #ff3333; color: #ff3333; }
-        
-        .terminal-output {
-            background: rgba(0, 5, 2, 0.40);
-            border: 1.5px solid #00ffcc;
-            border-radius: 5px;
-            padding: 8px;
-            font-size: 0.62rem;
-            color: #00ffcc;
-            height: 100px;
-            overflow-y: auto;
-            margin-top: 6px;
-        }
-        #hackerModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 5, 2, 0.88);
-            z-index: 9999;
-            justify-content: center; align-items: center;
-            flex-direction: column; padding: 20px;
-        }
-        .hacker-box {
-            width: 100%; max-width: 420px;
-            background: rgba(0, 20, 10, 0.7);
-            border: 2px solid #00ffcc;
-            border-radius: 10px; padding: 15px;
-            box-shadow: 0 0 40px #00ffcc; text-align: center;
-        }
-        .hacker-stream {
-            font-size: 0.7rem; color: #00ff66; height: 120px;
-            overflow: hidden; text-align: left; background: #000;
-            border: 1px solid #00ff66; padding: 8px; border-radius: 5px;
-        }
+        .terminal-output { background: rgba(0, 5, 2, 0.40); border: 1.5px solid #00ffcc; border-radius: 5px; padding: 8px; font-size: 0.62rem; color: #00ffcc; height: 100px; overflow-y: auto; margin-top: 6px; }
+        #hackerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 2, 0.88); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
+        .hacker-box { width: 100%; max-width: 420px; background: rgba(0, 20, 10, 0.7); border: 2px solid #00ffcc; border-radius: 10px; padding: 15px; box-shadow: 0 0 40px #00ffcc; text-align: center; }
+        .hacker-stream { font-size: 0.7rem; color: #00ff66; height: 120px; overflow: hidden; text-align: left; background: #000; border: 1px solid #00ff66; padding: 8px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -216,7 +59,6 @@
             <div class="subtitle">CYBER MATRIX HUB v4.0</div>
         </div>
 
-        <!-- Navigation Tabs -->
         <div class="nav-tabs">
             <button class="tab-btn active" id="btn-keys" onclick="switchTab('tab-keys', this)">⚡ Keys</button>
             <button class="tab-btn" id="btn-manage" onclick="switchTab('tab-manage', this)">🔄 Manage</button>
@@ -227,17 +69,11 @@
         <div id="tab-keys" class="tab-content active">
             <div class="card">
                 <div class="card-title">⚡ Generate License Key</div>
+                <div class="input-group"><label>Prefix</label><input type="text" id="keyPrefix" value="HRIDOY-AI"></div>
+                <div class="input-group"><label>Client Note / Name (কার জন্য বানাচ্ছেন)</label><input type="text" id="keyNote" placeholder="যেমন: Rahim vai"></div>
+                <div class="input-group"><label>Custom Duration Value</label><input type="number" id="customDuration" value="30" min="1"></div>
                 <div class="input-group">
-                    <label>Prefix</label>
-                    <input type="text" id="keyPrefix" value="HRIDOY-AI">
-                </div>
-                
-                <div class="input-group">
-                    <label>Custom Duration Value (কিবোর্ডে সংখ্যা লিখুন)</label>
-                    <input type="number" id="customDuration" value="30" min="1" placeholder="যেমন: 5, 10, 30 ইত্যাদি">
-                </div>
-                <div class="input-group">
-                    <label>Time Unit (সময় সিলেক্ট করুন)</label>
+                    <label>Time Unit</label>
                     <select id="timeUnit">
                         <option value="minutes">Minutes (মিনিট)</option>
                         <option value="hours">Hours (ঘণ্টা)</option>
@@ -246,20 +82,12 @@
                         <option value="lifetime">Lifetime / Unlimited</option>
                     </select>
                 </div>
-
-                <div class="input-group">
-                    <label>Device Limit (HWID)</label>
-                    <input type="number" id="deviceLimit" value="5" min="1" max="10">
-                </div>
                 <button class="btn" onclick="runHackerAnimation('generate')">Generate & Save Key</button>
             </div>
 
             <div class="card">
                 <div class="card-title">📢 Broadcast Notice to Apps</div>
-                <div class="input-group">
-                    <label>Popup Message</label>
-                    <textarea id="broadcastMsg" rows="2">Server optimized to v4.0! Enjoy AI features.</textarea>
-                </div>
+                <div class="input-group"><label>Popup Message</label><textarea id="broadcastMsg" rows="2">Server optimized to v4.0! Enjoy AI features.</textarea></div>
                 <button class="btn btn-cyan" onclick="runHackerAnimation('broadcast')">Push Global Notice</button>
             </div>
         </div>
@@ -268,19 +96,19 @@
         <div id="tab-manage" class="tab-content">
             <div class="card">
                 <div class="card-title">⏳ Extend Validity</div>
-                <div class="input-group"><label>Key</label><input type="text" id="extendKey" placeholder="HRIDOY-AI-XXXX"></div>
+                <div class="input-group"><label>Key or Device ID</label><input type="text" id="extendTarget" placeholder="HRIDOY-AI-XXXX"></div>
                 <div class="input-group"><label>Extra Days</label><input type="number" id="extraDays" value="30" min="1"></div>
                 <button class="btn btn-warning" onclick="runHackerAnimation('extend')">Extend Validity</button>
             </div>
             <div class="card">
                 <div class="card-title">🔄 Reset Device Binding</div>
-                <div class="input-group"><label>Key</label><input type="text" id="resetKey" placeholder="HRIDOY-AI-XXXX"></div>
+                <div class="input-group"><label>Key or Device ID</label><input type="text" id="resetTarget" placeholder="HRIDOY-AI-XXXX"></div>
                 <button class="btn btn-cyan" onclick="runHackerAnimation('reset')">Clear HWID Limits</button>
             </div>
             <div class="card">
-                <div class="card-title">🔒 Revoke / Block Key</div>
-                <div class="input-group"><label>Key</label><input type="text" id="targetKey" placeholder="HRIDOY-AI-XXXX"></div>
-                <button class="btn btn-danger" onclick="runHackerAnimation('revoke')">Block Key Permanently</button>
+                <div class="card-title">🗑️ Instant Delete / Revoke Key</div>
+                <div class="input-group"><label>Key or Device ID to Delete</label><input type="text" id="revokeTarget" placeholder="HRIDOY-AI-XXXX"></div>
+                <button class="btn btn-danger" onclick="runHackerAnimation('revoke')">Permanently Delete Key</button>
             </div>
         </div>
 
@@ -297,8 +125,7 @@
                     <button class="btn btn-danger" style="margin-top:0; font-size:0.62rem;" onclick="clearLogs()">Clear</button>
                 </div>
                 <div class="terminal-output" id="terminalLog">
-                    [SYSTEM] Admin Hub v4.0 Initialized.<br>
-                    [RENDER] Connected to: https://hridoy-1-8mnu.onrender.com
+                    [SYSTEM] Admin Hub v4.0 Initialized.<br>[RENDER] Connected to: https://hridoy-1-8mnu.onrender.com
                 </div>
             </div>
         </div>
@@ -308,10 +135,8 @@
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            const target = document.getElementById(tabId);
-            if(target) target.classList.add('active');
-            if(btnElement) btnElement.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
         }
 
         const canvas = document.getElementById('matrixCanvas');
@@ -324,7 +149,6 @@
         const fontSize = 14;
         let columns = Math.floor(canvas.width / fontSize);
         let drops = Array(columns).fill(1);
-
         function drawMatrix() {
             ctx.fillStyle = 'rgba(1, 4, 2, 0.12)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -353,12 +177,7 @@
             modal.style.display = 'flex';
             stream.innerHTML = "[INIT] Encrypting payload...<br>[CONNECT] Tunneling to Render Cloud API...";
             
-            let steps = [
-                "[AUTH] Validating Admin Token Signature...",
-                "[CALC] Computing expiration timestamp...",
-                "[SUCCESS] Command synchronized with Render Server!"
-            ];
-
+            let steps = ["[AUTH] Validating Admin Token...", "[SYNC] Transmitting packet to Render...", "[SUCCESS] Executed successfully!"];
             let i = 0;
             let interval = setInterval(() => {
                 if (i < steps.length) {
@@ -370,85 +189,110 @@
                     setTimeout(() => {
                         modal.style.display = 'none';
                         executeRealAction(actionType);
-                    }, 400);
+                    }, 300);
                 }
-            }, 200);
+            }, 150);
         }
 
         async function executeRealAction(type) {
             try {
                 if (type === 'generate') {
                     const prefix = document.getElementById('keyPrefix').value || 'HRIDOY-AI';
+                    const note = document.getElementById('keyNote').value || 'General User';
                     const durationVal = parseInt(document.getElementById('customDuration').value) || 1;
                     const timeUnit = document.getElementById('timeUnit').value;
-                    const limit = document.getElementById('deviceLimit').value;
                     
                     let durationMs = 0;
                     let planNameText = "";
-
-                    if (timeUnit === 'minutes') {
-                        durationMs = durationVal * 60 * 1000;
-                        planNameText = `${durationVal} Minutes VIP`;
-                    } else if (timeUnit === 'hours') {
-                        durationMs = durationVal * 60 * 60 * 1000;
-                        planNameText = `${durationVal} Hours VIP`;
-                    } else if (timeUnit === 'days') {
-                        durationMs = durationVal * 24 * 60 * 60 * 1000;
-                        planNameText = `${durationVal} Days VIP`;
-                    } else if (timeUnit === 'months') {
-                        durationMs = durationVal * 30 * 24 * 60 * 60 * 1000;
-                        planNameText = `${durationVal} Months VIP`;
-                    } else if (timeUnit === 'lifetime') {
-                        durationMs = 0;
-                        planNameText = "Lifetime VIP (Unlimited)";
-                    }
+                    if (timeUnit === 'minutes') { durationMs = durationVal * 60 * 1000; planNameText = `${durationVal} Mins`; }
+                    else if (timeUnit === 'hours') { durationMs = durationVal * 60 * 60 * 1000; planNameText = `${durationVal} Hours`; }
+                    else if (timeUnit === 'days') { durationMs = durationVal * 24 * 60 * 60 * 1000; planNameText = `${durationVal} Days`; }
+                    else if (timeUnit === 'months') { durationMs = durationVal * 30 * 24 * 60 * 60 * 1000; planNameText = `${durationVal} Months`; }
+                    else { durationMs = 0; planNameText = "Lifetime"; }
 
                     const randomCode = prefix + '-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
                     
-                    // ব্যাকগ্রাউন্ডে সার্ভারে রিকোয়েস্ট পাঠানো হবে, সার্ভার স্লিপ থাকলেও প্যানেল আটকাবে না
-                    fetch(`${API_BASE}/api/admin/generate-key`, {
+                    await fetch(`${API_BASE}/api/admin/generate-key`, {
                         method: 'POST',
-                        mode: 'cors',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ 
-                            custom_key: randomCode, 
-                            duration_ms: durationMs,
-                            plan_name: planNameText,
-                            device_limit: parseInt(limit) 
-                        })
-                    }).catch(e => console.log("Background sync pending..."));
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ custom_key: randomCode, duration_ms: durationMs, note: note })
+                    });
 
-                    logMessage(`[GENERATE] Key created (${planNameText}): <span style="color:#ffffff">${randomCode}</span>`);
+                    logMessage(`[GENERATE] (${note} - ${planNameText}): ${randomCode}`);
                     navigator.clipboard.writeText(randomCode);
-                    alert(`সফলভাবে কাস্টম মেয়াদের কি তৈরি ও কপি হয়েছে (${planNameText}):\n${randomCode}`);
-                } else if (type === 'broadcast') {
+                    alert(`কি তৈরি ও কপি হয়েছে (${note} | ${planNameText}):\n${randomCode}`);
+                } 
+                else if (type === 'broadcast') {
                     const msg = document.getElementById('broadcastMsg').value;
-                    fetch(`${API_BASE}/api/admin/broadcast`, {
+                    await fetch(`${API_BASE}/api/admin/broadcast`, {
                         method: 'POST',
-                        mode: 'cors',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: msg })
-                    }).catch(e => console.log("Background sync pending..."));
-
-                    logMessage(`[BROADCAST] Notice updated successfully.`);
-                    alert(`সফলতা! গ্লোবাল নোটিশ পাঠানো হয়েছে।`);
-                } else if (type === 'ping') {
+                    });
+                    logMessage(`[BROADCAST] Notice updated.`);
+                    alert(`গ্লোবাল নোটিশ আপডেট হয়েছে!`);
+                } 
+                else if (type === 'extend') {
+                    const target = document.getElementById('extendTarget').value;
+                    const days = document.getElementById('extraDays').value;
+                    const res = await fetch(`${API_BASE}/api/admin/extend`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ target, extra_days: days })
+                    });
+                    const data = await res.json();
+                    logMessage(`[EXTEND] ${data.message || 'Done'}`);
+                    alert(data.message || 'সফল!');
+                } 
+                else if (type === 'reset') {
+                    const target = document.getElementById('resetTarget').value;
+                    const res = await fetch(`${API_BASE}/api/admin/reset`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ target })
+                    });
+                    const data = await res.json();
+                    logMessage(`[RESET] ${data.message || 'Done'}`);
+                    alert(data.message || 'সফল!');
+                } 
+                else if (type === 'revoke') {
+                    const target = document.getElementById('revokeTarget').value;
+                    const res = await fetch(`${API_BASE}/api/admin/revoke`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ target })
+                    });
+                    const data = await res.json();
+                    logMessage(`[DELETE/REVOKE] ${data.message || 'Done'}`);
+                    alert(data.message || 'সফলভাবে ডিলিট করা হয়েছে!');
+                } 
+                else if (type === 'export') {
+                    const res = await fetch(`${API_BASE}/api/admin/backup`);
+                    const data = await res.json();
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'hridoy_matrix_backup.json';
+                    a.click();
+                    logMessage(`[BACKUP] JSON downloaded.`);
+                    alert('ডাটাবেজ ব্যাকআপ ফাইল ডাউনলোড হয়েছে!');
+                } 
+                else if (type === 'ping') {
                     const start = Date.now();
-                    await fetch(`${API_BASE}/`, { method: 'GET', mode: 'cors' });
+                    await fetch(`${API_BASE}/`, { method: 'GET' });
                     const ping = Date.now() - start;
-                    logMessage(`[PING] Render online (${ping}ms).`);
-                    alert(`সার্ভার পিং সফল (${ping}ms)। সার্ভার সচল আছে!`);
-                } else {
-                    alert('কমান্ড সফলভাবে সম্পন্ন হয়েছে!');
+                    logMessage(`[PING] Online (${ping}ms).`);
+                    alert(`সার্ভার পিং সফল (${ping}ms) সচল আছে!`);
                 }
             } catch(err) {
                 console.error(err);
-                alert('কমান্ড এক্সিকিউট হয়েছে!');
+                alert('সার্ভার কানেকশন এরর!');
             }
         }
 
         function clearLogs() {
-            document.getElementById('terminalLog').innerHTML = '[SYSTEM] Terminal logs cleared.';
+            document.getElementById('terminalLog').innerHTML = '[SYSTEM] Logs cleared.';
         }
     </script>
 </body>
