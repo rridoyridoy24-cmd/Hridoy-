@@ -11,25 +11,24 @@ app.use(cors({
 
 app.use(express.json());
 
-// ব্যাকএন্ডে কি এবং তার মেয়াদ (Duration in ms) স্টোর করার জন্য মেমোরি স্টোরেজ
-// এখানে কি জেনারেট হয়ে জমা থাকবে
-let pendingKeys = new Map(); // Format: { "HRIDOY-AI-XXXX": duration_ms }
+// পেন্ডিং কি এবং তার সঠিক মেয়াদ (মিলি সেকেন্ডে) স্টোর করার মেমোরি
+let pendingKeys = new Map(); // Format: { "KEY_CODE": duration_ms }
 
-// যেসব কি অলরেডি একবার ইউজ হয়ে গেছে বা একটিভ আছে
+// অলরেডি অ্যাক্টিভ হওয়া লাইসেন্স (Device ID অনুযায়ী)
 let activeUserLicenses = new Map(); // Format: { "device_id": { key, expires_at } }
 
-// ১. অ্যাডমিন প্যানেল থেকে নতুন কি জেনারেট করে সার্ভারে সেভ করার রাউট
+// ১. অ্যাডমিন প্যানেল থেকে কাস্টম মেয়াদসহ কি জেনারেট করার রাউট
 app.post('/api/admin/generate-key', (req, res) => {
     const { custom_key, duration_ms } = req.body;
     
     if (custom_key) {
-        // সার্ভারে কি এবং তার মেয়াদ সেভ হলো
-        pendingKeys.set(custom_key, duration_ms);
-        console.log("New Key Generated & Saved to Server:", custom_key, "Duration (ms):", duration_ms);
+        // প্যানেল থেকে পাঠানো সঠিক মেয়াদসহ কি সেভ করা হলো
+        pendingKeys.set(custom_key, Number(duration_ms));
+        console.log(`[GENERATE] Key: ${custom_key}, Duration (ms): ${duration_ms}`);
         
         res.json({
             success: true,
-            message: "Key generated and saved successfully",
+            message: "Key generated successfully",
             key: custom_key
         });
     } else {
@@ -37,12 +36,12 @@ app.post('/api/admin/generate-key', (req, res) => {
     }
 });
 
-// ২. অ্যাপ থেকে কি দিয়ে ভেরিফাই ও অ্যাক্টিভ করার রাউট (একবার ব্যবহার করলে কি সার্ভার থেকে মুছে যাবে)
+// ২. অ্যাপ থেকে কি ভেরিফাই করার সুনির্দিষ্ট ও কঠোর লজিক
 app.post('/api/license/verify', (req, res) => {
     const { key, device_id } = req.body;
-    console.log("Verification request - Key:", key, "Device:", device_id);
+    console.log(`[VERIFY ATTEMPT] Key: ${key}, Device: ${device_id}`);
 
-    // চেক করা যাক ইউজার ইতিপূর্বে এই ডিভাইসে প্রিমিয়াম আছে কি না
+    // যদি এই ডিভাইস ইতিমধ্যে একটিভ থাকে এবং মেয়াদ শেষ না হয়
     if (activeUserLicenses.has(device_id)) {
         const license = activeUserLicenses.get(device_id);
         if (Date.now() < license.expires_at) {
@@ -52,28 +51,29 @@ app.post('/api/license/verify', (req, res) => {
                 expires_at: license.expires_at
             });
         } else {
-            activeUserLicenses.delete(device_id); // মেয়াদ শেষ হলে রিমুভ
+            activeUserLicenses.delete(device_id);
         }
     }
 
-    // চেক করা যাক কি-টি পেন্ডিং লিস্টে আছে কি না
+    // অত্যন্ত কঠোর চেক: কি-টি সত্যি সত্যি প্যানেল থেকে জেনারেট করা পেন্ডিং লিস্টে আছে কি না?
     if (pendingKeys.has(key)) {
         const duration_ms = pendingKeys.get(key);
         
-        // অত্যন্ত গুরুত্বপূর্ণ অংশ: কি একবার ব্যবহার হওয়ামাত্র সার্ভার থেকে চিরতরে মুছে ফেলা হলো!
+        // ১. কি একবার ব্যবহার হওয়া মাত্র সার্ভার থেকে চিরতরে ডিলিট (Burn on use)
         pendingKeys.delete(key);
 
         let expires_at = 0;
-        if (duration_ms === 0) {
-            expires_at = 8640000000000000; // Lifetime (আনলিমিটেড)
+        if (duration_ms === 0 || isNaN(duration_ms)) {
+            expires_at = 8640000000000000; // Lifetime
         } else {
-            expires_at = Date.now() + duration_ms; // বর্তমান সময় + কাস্টম মেয়াদ
+            // প্যানেল থেকে পাঠানো সঠিক সময় (মিনিট, ঘণ্টা বা দিন) যোগ করা হলো
+            expires_at = Date.now() + duration_ms;
         }
 
-        // ডিভাইসের সাথে বাইন্ড করে সেভ করা হলো
+        // ডিভাইসের সাথে বাইন্ধ করে সেভ করা হলো
         activeUserLicenses.set(device_id, { key, expires_at });
 
-        console.log("Key successfully consumed and deleted from server:", key);
+        console.log(`[SUCCESS] Key consumed & burned: ${key}, Expires at: ${new Date(expires_at)}`);
 
         return res.json({
             valid: true,
@@ -81,6 +81,8 @@ app.post('/api/license/verify', (req, res) => {
             expires_at: expires_at
         });
     } else {
+        // ভুল কোড বা অলরেডি ইউজ করা কোড হলে সরাসরি রিজেক্ট করবে!
+        console.log(`[REJECTED] Invalid or reused key attempted: ${key}`);
         return res.json({
             valid: false,
             message: "Invalid or Already Used Key!"
