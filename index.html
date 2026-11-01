@@ -17,8 +17,8 @@
         .dot-green { background: #00ff66; box-shadow: 0 0 10px #00ff66; }
         h1 { font-size: 1.2rem; color: #ffffff; text-shadow: 0 0 10px #00ffcc; letter-spacing: 2px; }
         .subtitle { font-size: 0.65rem; color: #88ffcc; text-transform: uppercase; }
-        .nav-tabs { display: flex; gap: 5px; margin-bottom: 12px; background: rgba(0, 10, 5, 0.35); padding: 5px; border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.6); position: sticky; top: 5px; z-index: 10; }
-        .tab-btn { flex: 1; background: rgba(0, 20, 10, 0.25); border: 1.5px solid #00ffcc; color: #00ffcc; padding: 8px 4px; font-size: 0.65rem; font-weight: bold; border-radius: 5px; cursor: pointer; text-align: center; text-transform: uppercase; }
+        .nav-tabs { display: flex; gap: 4px; margin-bottom: 12px; background: rgba(0, 10, 5, 0.35); padding: 5px; border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.6); position: sticky; top: 5px; z-index: 10; }
+        .tab-btn { flex: 1; background: rgba(0, 20, 10, 0.25); border: 1.5px solid #00ffcc; color: #00ffcc; padding: 8px 2px; font-size: 0.6rem; font-weight: bold; border-radius: 5px; cursor: pointer; text-align: center; text-transform: uppercase; }
         .tab-btn.active, .tab-btn:hover { background: #00ffcc; color: #010402; box-shadow: 0 0 20px #00ffcc; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -32,7 +32,12 @@
         .btn-cyan { border-color: #00ffff; color: #00ffff; }
         .btn-warning { border-color: #ffcc00; color: #ffcc00; }
         .btn-danger { border-color: #ff3333; color: #ff3333; }
-        .terminal-output { background: rgba(0, 5, 2, 0.40); border: 1.5px solid #00ffcc; border-radius: 5px; padding: 8px; font-size: 0.62rem; color: #00ffcc; height: 100px; overflow-y: auto; margin-top: 6px; }
+        .terminal-output { background: rgba(0, 5, 2, 0.40); border: 1.5px solid #00ffcc; border-radius: 5px; padding: 8px; font-size: 0.62rem; color: #00ffcc; height: 120px; overflow-y: auto; margin-top: 6px; }
+        
+        .preview-box { background: rgba(0, 20, 10, 0.4); border: 1px dashed #00ff66; border-radius: 6px; padding: 8px; margin-top: 8px; max-height: 140px; overflow-y: auto; font-size: 0.65rem; color: #00ff66; }
+        .stats-container { display: flex; gap: 5px; margin-bottom: 8px; }
+        .stats-badge { flex: 1; background: rgba(0, 255, 204, 0.1); border: 1px solid #00ffcc; padding: 5px; border-radius: 4px; font-size: 0.6rem; text-align: center; }
+
         #hackerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 2, 0.88); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
         .hacker-box { width: 100%; max-width: 420px; background: rgba(0, 20, 10, 0.7); border: 2px solid #00ffcc; border-radius: 10px; padding: 15px; box-shadow: 0 0 40px #00ffcc; text-align: center; }
         .hacker-stream { font-size: 0.7rem; color: #00ff66; height: 120px; overflow: hidden; text-align: left; background: #000; border: 1px solid #00ff66; padding: 8px; border-radius: 5px; }
@@ -56,12 +61,13 @@
                 <div class="dot dot-green"></div>
             </div>
             <h1>HRIDOY AI ASSISTANT</h1>
-            <div class="subtitle">CYBER MATRIX HUB v4.0</div>
+            <div class="subtitle">CYBER MATRIX HUB v4.0 (OMNI-CONTROL EDITION)</div>
         </div>
 
         <div class="nav-tabs">
             <button class="tab-btn active" id="btn-keys" onclick="switchTab('tab-keys', this)">⚡ Keys</button>
             <button class="tab-btn" id="btn-manage" onclick="switchTab('tab-manage', this)">🔄 Manage</button>
+            <button class="tab-btn" id="btn-menu" onclick="switchTab('tab-menu', this)">📂 Menu</button>
             <button class="tab-btn" id="btn-system" onclick="switchTab('tab-system', this)">🖥️ System</button>
         </div>
 
@@ -112,7 +118,51 @@
             </div>
         </div>
 
-        <!-- TAB 3: System -->
+        <!-- TAB 3: Menu (Dynamic Drawer Menu & Advanced Builder) -->
+        <div id="tab-menu" class="tab-content">
+            <div class="card">
+                <div class="card-title">📂 Quick Menu Item Adder</div>
+                <div class="input-group"><label>Menu Title (যেমন: Custom AI)</label><input type="text" id="newMenuTitle" placeholder="Feature Name"></div>
+                <div class="input-group"><label>Action Code (যেমন: custom_page)</label><input type="text" id="newMenuAction" placeholder="action_tag"></div>
+                <button class="btn btn-warning" onclick="addMenuItemQuickly()">➕ Add Item to JSON</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚙️ Dynamic Drawer Menu Config</div>
+                <div class="stats-container">
+                    <div class="stats-badge" id="menuCountBadge">Items: 0</div>
+                    <div class="stats-badge" id="jsonStatusBadge" style="color:#00ff66;">Status: Valid</div>
+                </div>
+                <div class="input-group">
+                    <label>Menu JSON Data</label>
+                    <textarea id="menuJsonInput" rows="6" oninput="updateLivePreview()" placeholder='{
+  "menu_items": [
+    { "title": "Updates", "action": "updates_page" },
+    { "title": "Premium Key (active)", "action": "premium_page" },
+    { "title": "Permissions", "action": "permissions_page" },
+    { "title": "Voice Pack", "action": "voice_page" },
+    { "title": "API Key", "action": "apikey_page" }
+  ]
+}'></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+                    <button class="btn" style="margin-top:0; font-size:0.55rem;" onclick="formatJsonCode()">Format</button>
+                    <button class="btn btn-warning" style="margin-top:0; font-size:0.55rem;" onclick="loadDefaultMenuTemplate()">Preset</button>
+                    <button class="btn btn-cyan" style="margin-top:0; font-size:0.55rem;" onclick="copyJsonToClipboard()">Copy JSON</button>
+                    <button class="btn btn-danger" style="margin-top:0; font-size:0.55rem;" onclick="clearMenuBox()">Clear</button>
+                </div>
+
+                <div class="input-group">
+                    <label>👁️ Live Drawer Preview</label>
+                    <div class="preview-box" id="livePreviewBox">Type JSON to see preview...</div>
+                </div>
+
+                <button class="btn btn-cyan" onclick="runHackerAnimation('update_menu')">💾 Save & Push Menu to Server</button>
+            </div>
+        </div>
+
+        <!-- TAB 4: System -->
         <div id="tab-system" class="tab-content">
             <div class="card">
                 <div class="card-title">💾 Database Backup</div>
@@ -122,6 +172,7 @@
                 <div class="card-title">🖥️ Terminal & Diagnostics</div>
                 <div style="display: flex; gap: 5px; margin-bottom: 6px;">
                     <button class="btn" style="margin-top:0; font-size:0.62rem;" onclick="runHackerAnimation('ping')">Ping Server</button>
+                    <button class="btn btn-cyan" style="margin-top:0; font-size:0.62rem;" onclick="saveLocalStorageBackup()">Save Local Cache</button>
                     <button class="btn btn-danger" style="margin-top:0; font-size:0.62rem;" onclick="clearLogs()">Clear</button>
                 </div>
                 <div class="terminal-output" id="terminalLog">
@@ -169,6 +220,133 @@
             const term = document.getElementById('terminalLog');
             term.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${msg}`;
             term.scrollTop = term.scrollHeight;
+        }
+
+        // অটো সেভ ও লোকাল স্টোরেজ লোড
+        window.onload = function() {
+            const savedMenu = localStorage.getItem('hridoy_saved_menu');
+            if(savedMenu) {
+                document.getElementById('menuJsonInput').value = savedMenu;
+                updateLivePreview();
+            } else {
+                loadDefaultMenuTemplate();
+            }
+        };
+
+        function saveLocalStorageBackup() {
+            const content = document.getElementById('menuJsonInput').value;
+            localStorage.setItem('hridoy_saved_menu', content);
+            alert('লোকাল ব্রাউজারে জেসন ব্যাকআপ সেভ হয়েছে!');
+            logMessage('[SYSTEM] Menu JSON cached locally.');
+        }
+
+        function loadDefaultMenuTemplate() {
+            const defaultData = {
+                "menu_items": [
+                    { "title": "Updates", "action": "updates_page" },
+                    { "title": "Premium Key (active)", "action": "premium_page" },
+                    { "title": "Permissions", "action": "permissions_page" },
+                    { "title": "Voice Pack", "action": "voice_page" },
+                    { "title": "API Key", "action": "apikey_page" },
+                    { "title": "Live Code", "action": "livecode_page" }
+                ]
+            };
+            document.getElementById('menuJsonInput').value = JSON.stringify(defaultData, null, 2);
+            updateLivePreview();
+        }
+
+        function clearMenuBox() {
+            document.getElementById('menuJsonInput').value = "";
+            updateLivePreview();
+        }
+
+        function copyJsonToClipboard() {
+            const content = document.getElementById('menuJsonInput').value;
+            navigator.clipboard.writeText(content);
+            alert('জেসন কোড ক্লিপবোর্ডে কপি করা হয়েছে!');
+        }
+
+        function formatJsonCode() {
+            const textarea = document.getElementById('menuJsonInput');
+            try {
+                const parsed = JSON.parse(textarea.value);
+                textarea.value = JSON.stringify(parsed, null, 2);
+                updateLivePreview();
+                alert('JSON কোড সুন্দরভাবে ফরম্যাট করা হয়েছে!');
+            } catch(e) {
+                alert('❌ ফরম্যাট করার মতো সঠিক JSON পাওয়া যায়নি!');
+            }
+        }
+
+        function addMenuItemQuickly() {
+            const title = document.getElementById('newMenuTitle').value.trim();
+            const action = document.getElementById('newMenuAction').value.trim();
+            const textarea = document.getElementById('menuJsonInput');
+
+            if(!title || !action) {
+                alert('দয়া করে মেনুর নাম এবং অ্যাকশন কোড উভয়ই দিন!');
+                return;
+            }
+
+            let currentObj = { "menu_items": [] };
+            try {
+                if(textarea.value.trim() !== "") {
+                    currentObj = JSON.parse(textarea.value);
+                }
+            } catch(e) {
+                alert('বিদ্যমান JSON কোডে সিনট্যাক্স ভুল আছে, ঠিক করে নিন।');
+                return;
+            }
+
+            if(!currentObj.menu_items) currentObj.menu_items = [];
+            currentObj.menu_items.push({ "title": title, "action": action });
+            
+            textarea.value = JSON.stringify(currentObj, null, 2);
+            document.getElementById('newMenuTitle').value = "";
+            document.getElementById('newMenuAction').value = "";
+            updateLivePreview();
+            alert('নতুন মেনু সফলভাবে JSON বক্সে যুক্ত হয়েছে!');
+        }
+
+        function updateLivePreview() {
+            const rawJson = document.getElementById('menuJsonInput').value;
+            const previewBox = document.getElementById('livePreviewBox');
+            const badge = document.getElementById('menuCountBadge');
+            const statusBadge = document.getElementById('jsonStatusBadge');
+            
+            if(!rawJson.trim()) {
+                previewBox.innerHTML = "Box is empty...";
+                badge.innerText = "Items: 0";
+                statusBadge.innerText = "Status: Empty";
+                statusBadge.style.color = "#ffcc00";
+                return;
+            }
+            try {
+                const parsed = JSON.parse(rawJson);
+                if(parsed.menu_items && Array.isArray(parsed.menu_items)) {
+                    badge.innerText = `Items: ${parsed.menu_items.length}`;
+                    statusBadge.innerText = "Status: Valid";
+                    statusBadge.style.color = "#00ff66";
+                    let html = "<b>Valid Menu List:</b><br>";
+                    parsed.menu_items.forEach((item, index) => {
+                        html += `👉 [${index+1}] ${item.title} ➔ (${item.action})<br>`;
+                    });
+                    previewBox.innerHTML = html;
+                    previewBox.style.color = "#00ff66";
+                } else {
+                    badge.innerText = "Items: ?";
+                    statusBadge.innerText = "Status: Array Missing";
+                    statusBadge.style.color = "#ffcc00";
+                    previewBox.innerHTML = "⚠️ Warning: 'menu_items' array missing!";
+                    previewBox.style.color = "#ffcc00";
+                }
+            } catch(e) {
+                badge.innerText = "Items: Error";
+                statusBadge.innerText = "Status: Syntax Error";
+                statusBadge.style.color = "#ff3333";
+                previewBox.innerHTML = "❌ Syntax Error: ব্র্যাকেট বা কোটেশন চেক করুন!";
+                previewBox.style.color = "#ff3333";
+            }
         }
 
         function runHackerAnimation(actionType) {
@@ -266,6 +444,23 @@
                     logMessage(`[DELETE/REVOKE] ${data.message || 'Done'}`);
                     alert(data.message || 'সফলভাবে ডিলিট করা হয়েছে!');
                 } 
+                else if (type === 'update_menu') {
+                    const rawJson = document.getElementById('menuJsonInput').value;
+                    try {
+                        const parsedJson = JSON.parse(rawJson);
+                        const res = await fetch(`${API_BASE}/api/admin/update-menu`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(parsedJson)
+                        });
+                        await res.json();
+                        logMessage(`[MENU] Drawer menu config updated successfully.`);
+                        alert('ড্রয়ার মেনু সফলভাবে সার্ভারে আপডেট হয়েছে!');
+                    } catch (e) {
+                        alert('❌ Error: ভুল JSON ফরম্যাট! ব্র্যাকেট বা কোটেশন ঠিক আছে কি না চেক করুন।');
+                        logMessage(`[ERROR] Invalid JSON format in menu config.`);
+                    }
+                }
                 else if (type === 'export') {
                     const res = await fetch(`${API_BASE}/api/admin/backup`);
                     const data = await res.json();
