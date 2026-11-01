@@ -11,12 +11,24 @@ app.use(cors({
 
 app.use(express.json());
 
-// কি এবং তার বিস্তারিত তথ্য (যেমন: মেয়াদ ও কার কাছে দেওয়া হলো) স্টোর করার মেমোরি
-let pendingKeys = new Map(); // Format: { "KEY_CODE": { duration_ms, note, created_at } }
-let activeUserLicenses = new Map(); // Format: { "device_id": { key, expires_at } }
+// মেমোরি ডাটাবেজ
+let pendingKeys = new Map(); 
+let activeUserLicenses = new Map(); 
 let globalNotice = "Server optimized to v4.0! Enjoy AI features.";
 
-// ১. কি জেনারেট করার রাউট (নোটসহ সেভ হবে)
+// ডাইনামিক ড্রয়ার মেনু কনফিগারেশন
+let drawerMenuConfig = {
+    "menu_items": [
+        { "title": "Updates", "action": "updates_page" },
+        { "title": "Premium Key (active)", "action": "premium_page" },
+        { "title": "Permissions", "action": "permissions_page" },
+        { "title": "Voice Pack", "action": "voice_page" },
+        { "title": "API Key", "action": "apikey_page" },
+        { "title": "Live Code", "action": "livecode_page" }
+    ]
+};
+
+// ১. কি জেনারেট করার রাউট
 app.post('/api/admin/generate-key', (req, res) => {
     const { custom_key, duration_ms, note } = req.body;
     if (custom_key) {
@@ -46,7 +58,7 @@ app.post('/api/license/verify', (req, res) => {
 
     if (pendingKeys.has(key)) {
         const keyData = pendingKeys.get(key);
-        pendingKeys.delete(key); // একবার ইউজ করলে সার্ভার থেকে ডিলিট (Burn on use)
+        pendingKeys.delete(key); 
 
         let expires_at = (keyData.duration_ms === 0 || isNaN(keyData.duration_ms)) ? 8640000000000000 : Date.now() + keyData.duration_ms;
         activeUserLicenses.set(device_id, { key, expires_at });
@@ -120,19 +132,19 @@ app.post('/api/admin/reset', (req, res) => {
     }
 });
 
-// ৭. কি সরাসরি ডিলিট বা ব্লক করা (Revoke / Delete Key instantly)
+// ৭. কি সরাসরি ডিলিট বা ব্লক করা
 app.post('/api/admin/revoke', (req, res) => {
     const { target } = req.body;
     let revoked = false;
 
     if (pendingKeys.has(target)) {
-        pendingKeys.delete(target); // পেন্ডিং লিস্ট থেকে চিরতরে ডিলিট
+        pendingKeys.delete(target);
         revoked = true;
     }
 
     for (let [devId, license] of activeUserLicenses.entries()) {
         if (devId === target || license.key === target) {
-            activeUserLicenses.delete(devId); // একটিভ লিস্ট থেকেও ডিলিট
+            activeUserLicenses.delete(devId);
             revoked = true;
         }
     }
@@ -144,15 +156,35 @@ app.post('/api/admin/revoke', (req, res) => {
     }
 });
 
-// ৮. ডাটাবেজ ব্যাকআপ (Download JSON Backup)
+// ৮. ডাটাবেজ ব্যাকআপ
 app.get('/api/admin/backup', (req, res) => {
     const backupData = {
         pendingKeys: Object.fromEntries(pendingKeys),
         activeUserLicenses: Object.fromEntries(activeUserLicenses),
         globalNotice: globalNotice,
+        drawerMenuConfig: drawerMenuConfig,
         timestamp: new Date().toISOString()
     };
     res.json(backupData);
+});
+
+// ৯. অ্যাডমিন প্যানেল থেকে ড্রয়ার মেনু আপডেট করার এন্ডপয়েন্ট
+app.post('/api/admin/update-menu', (req, res) => {
+    const newMenuData = req.body;
+    if (newMenuData && newMenuData.menu_items && Array.isArray(newMenuData.menu_items)) {
+        drawerMenuConfig = newMenuData;
+        return res.json({ success: true, message: "Drawer menu updated successfully!" });
+    } else {
+        res.status(400).json({ success: false, message: "Invalid menu format!" });
+    }
+});
+
+// ১০. অ্যান্ড্রয়েড অ্যাপের জন্য ড্রয়ার মেনু ফেচ করার এন্ডপয়েন্ট
+app.get('/api/get-menu', (req, res) => {
+    res.json({
+        status: "success",
+        ...drawerMenuConfig
+    });
 });
 
 app.get('/', (req, res) => {
