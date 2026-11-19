@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -187,8 +188,9 @@ app.get('/api/get-menu', (req, res) => {
     });
 });
 
+// অ্যাডমিন প্যানেল (`index.html`) ওপেন করার রাউট
 app.get('/', (req, res) => {
-    res.send('Secure License Server is Live!');
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
